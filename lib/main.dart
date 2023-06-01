@@ -1,51 +1,39 @@
 import 'package:flutter/material.dart';
 
+import './main_page.dart';
+import './planning_page.dart';
+
 void main() => runApp(const MyApp());
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Anvol App',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: const ColorScheme(
+          brightness: Brightness.light,
+          primary: Color(0xffB2CB06),
+          onPrimary: Colors.white,
+          secondary: Color(0xff80B845),
+          onSecondary: Colors.white,
+          error: Color(0xffE41600),
+          onError: Colors.white,
+          surface: Color(0xffE7E7E7),
+          onSurface: Colors.black,
+          background: Colors.white,
+          onBackground: Colors.black,
+        ),
         useMaterial3: true,
         fontFamily: 'Poppins',
       ),
-      home: const AnvolHomePage(title: 'Anvol App'),
-    );
-  }
-}
-
-class AnvolHomePage extends StatefulWidget {
-  const AnvolHomePage({super.key, required this.title});
-  final String title;
-
-  @override
-  State<AnvolHomePage> createState() => _AnvolHomePageState();
-}
-
-class _AnvolHomePageState extends State<AnvolHomePage> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: const Color(0xffB2CB06),
-        title: Text(widget.title),
-      ),
-      body: const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'WIP',
-            ),
-          ],
-        ),
-      ),
-      backgroundColor: const Color(0xffE7E7E7),
+      routes: {
+        '/': (context) => const MainPage(title: 'Anvol'),
+        '/planning_page/': (context) => const PlanningPage()
+      },
+      initialRoute: '/',
     );
   }
 }
