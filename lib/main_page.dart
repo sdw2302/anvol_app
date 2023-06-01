@@ -1,9 +1,9 @@
+import 'package:anvol_app/hr_page.dart';
 import 'package:flutter/material.dart';
 import './planning_page.dart';
 
 class MainPage extends StatefulWidget {
-  const MainPage({Key? key, required this.title}) : super(key: key);
-  final String title;
+  const MainPage({Key? key}) : super(key: key);
 
   @override
   State<MainPage> createState() => _MainPageState();
@@ -13,11 +13,9 @@ class _MainPageState extends State<MainPage> {
   int _currentIndex = 0;
 
   final List<Widget> _pages = [
-    const MainPageContent(
-      title: 'Homepage',
-    ),
+    const MainPageContent(),
     const PlanningPage(),
-    // Add other pages here
+    const HRPage(),
   ];
 
   @override
@@ -26,7 +24,7 @@ class _MainPageState extends State<MainPage> {
       appBar: AppBar(
         foregroundColor: Colors.white,
         backgroundColor: const Color(0xffB2CB06),
-        title: Text(widget.title),
+        title: const Text('Anvol App'),
         centerTitle: true,
       ),
       body: _pages[_currentIndex],
@@ -51,6 +49,7 @@ class _MainPageState extends State<MainPage> {
             label: 'HR',
           ),
         ],
+        backgroundColor: const Color(0xffE7E7E7),
       ),
       backgroundColor: Colors.white,
     );
@@ -58,16 +57,15 @@ class _MainPageState extends State<MainPage> {
 }
 
 class MainPageContent extends StatelessWidget {
-  const MainPageContent({Key? key, required this.title}) : super(key: key);
-  final String title;
+  const MainPageContent({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return const Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          Text(title),
+          Text('Home page'),
         ],
       ),
     );

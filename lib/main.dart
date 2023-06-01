@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import './main_page.dart';
 import './planning_page.dart';
+import './hr_page.dart';
 
 void main() => runApp(const MyApp());
 
@@ -30,8 +31,9 @@ class MyApp extends StatelessWidget {
         fontFamily: 'Poppins',
       ),
       routes: {
-        '/': (context) => const MainPage(title: 'Anvol'),
-        '/planning_page/': (context) => const PlanningPage()
+        '/': (context) => const MainPage(),
+        '/planning_page/': (context) => const PlanningPage(),
+        '/hr_page/': (context) => const HRPage(),
       },
       initialRoute: '/',
     );
