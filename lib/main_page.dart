@@ -13,6 +13,7 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   int _currentIndex = 0;
   bool loggedIn = false;
+  String username = '';
 
   final List<Widget> _pages = [
     const MainPageContent(),
@@ -77,23 +78,25 @@ class _MainPageState extends State<MainPage> {
   }
 
   void _showLoginDialog(BuildContext context) {
+    TextEditingController usernameController = TextEditingController();
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Login'),
+          title: const Text('Welcome!'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextFormField(
-                decoration: InputDecoration(
+                controller: usernameController,
+                decoration: const InputDecoration(
                   labelText: 'Username',
                 ),
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               TextFormField(
                 obscureText: true,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Password',
                 ),
               ),
@@ -101,8 +104,9 @@ class _MainPageState extends State<MainPage> {
           ),
           actions: [
             TextButton(
-              child: Text('Login'),
+              child: const Text('Login'),
               onPressed: () {
+                username = usernameController.text;
                 // Perform login logic
 
                 // Once login is successful, close the dialog
@@ -111,7 +115,7 @@ class _MainPageState extends State<MainPage> {
               },
             ),
             TextButton(
-              child: Text('Cancel'),
+              child: const Text('Cancel'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -127,14 +131,22 @@ class _MainPageState extends State<MainPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Notification'),
-          content: Text('This is a notification!'),
+          title: Text('Hi, $username'),
+          content: const Text('This is a test!'),
           actions: [
             TextButton(
-              child: Text('Close'),
+              child: const Text('Close'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
+            ),
+            TextButton(
+              onPressed: () {
+                loggedIn = false;
+                username = '';
+                Navigator.of(context).pop();
+              },
+              child: const Text('Logout'),
             ),
           ],
         );
