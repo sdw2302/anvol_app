@@ -1,7 +1,7 @@
+import 'package:anvol_app/planning_page.dart';
 import 'package:anvol_app/hr_page.dart';
 import 'package:anvol_app/reports_page.dart';
 import 'package:flutter/material.dart';
-import './planning_page.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({Key? key}) : super(key: key);
