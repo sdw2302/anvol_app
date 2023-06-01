@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import './main_page.dart';
 import './planning_page.dart';
 import './hr_page.dart';
+import './reports_page.dart';
 
 void main() => runApp(const MyApp());
 
@@ -34,6 +35,7 @@ class MyApp extends StatelessWidget {
         '/': (context) => const MainPage(),
         '/planning_page/': (context) => const PlanningPage(),
         '/hr_page/': (context) => const HRPage(),
+        '/reports_page/': (context) => const ReportsPage(),
       },
       initialRoute: '/',
     );

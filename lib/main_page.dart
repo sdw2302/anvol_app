@@ -1,4 +1,5 @@
 import 'package:anvol_app/hr_page.dart';
+import 'package:anvol_app/reports_page.dart';
 import 'package:flutter/material.dart';
 import './planning_page.dart';
 
@@ -11,11 +12,13 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   int _currentIndex = 0;
+  bool loggedIn = false;
 
   final List<Widget> _pages = [
     const MainPageContent(),
     const PlanningPage(),
     const HRPage(),
+    const ReportsPage(),
   ];
 
   @override
@@ -26,6 +29,18 @@ class _MainPageState extends State<MainPage> {
         backgroundColor: const Color(0xffB2CB06),
         title: const Text('Anvol App'),
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.login),
+            onPressed: () {
+              if (!loggedIn) {
+                _showLoginDialog(context);
+              } else {
+                _showPersonalInfoPopup(context);
+              }
+            },
+          )
+        ],
       ),
       body: _pages[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
@@ -48,10 +63,82 @@ class _MainPageState extends State<MainPage> {
             icon: Icon(Icons.people),
             label: 'HR',
           ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.analytics),
+            label: 'Reports',
+          ),
         ],
         backgroundColor: const Color(0xffE7E7E7),
+        selectedItemColor: const Color(0xffFFD30B),
+        unselectedItemColor: Colors.grey,
       ),
       backgroundColor: Colors.white,
+    );
+  }
+
+  void _showLoginDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Login'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextFormField(
+                decoration: InputDecoration(
+                  labelText: 'Username',
+                ),
+              ),
+              SizedBox(height: 16),
+              TextFormField(
+                obscureText: true,
+                decoration: InputDecoration(
+                  labelText: 'Password',
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              child: Text('Login'),
+              onPressed: () {
+                // Perform login logic
+
+                // Once login is successful, close the dialog
+                loggedIn = true;
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showPersonalInfoPopup(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Notification'),
+          content: Text('This is a notification!'),
+          actions: [
+            TextButton(
+              child: Text('Close'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }
