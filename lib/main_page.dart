@@ -48,36 +48,40 @@ class _MainPageState extends State<MainPage> {
         ],
       ),
       body: _pages[_currentIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: (int index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_today_rounded),
-            label: 'Planning',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.people),
-            label: 'HR',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.analytics),
-            label: 'Reports',
-          ),
-        ],
-        backgroundColor: const Color(0xffE7E7E7),
-        selectedItemColor: const Color(0xffFFD30B),
-        unselectedItemColor: Colors.grey,
-      ),
+      bottomNavigationBar: loggedIn ? _buildBottomNavigationBar() : null,
       backgroundColor: Colors.white,
+    );
+  }
+
+  BottomNavigationBar _buildBottomNavigationBar() {
+    return BottomNavigationBar(
+      currentIndex: _currentIndex,
+      onTap: (int index) {
+        setState(() {
+          _currentIndex = index;
+        });
+      },
+      items: const [
+        BottomNavigationBarItem(
+          icon: Icon(Icons.home),
+          label: 'Home',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.calendar_today_rounded),
+          label: 'Planning',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.people),
+          label: 'HR',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.analytics),
+          label: 'Reports',
+        ),
+      ],
+      backgroundColor: const Color(0xffE7E7E7),
+      selectedItemColor: const Color(0xffFFD30B),
+      unselectedItemColor: Colors.grey,
     );
   }
 
@@ -97,7 +101,6 @@ class _MainPageState extends State<MainPage> {
                   labelText: 'Username',
                 ),
               ),
-              const SizedBox(height: 16),
               TextFormField(
                 obscureText: true,
                 decoration: const InputDecoration(
@@ -151,6 +154,7 @@ class _MainPageState extends State<MainPage> {
                 setState(() {
                   loggedIn = false;
                   username = '';
+                  _currentIndex = 0;
                 });
                 Navigator.of(context).pop();
               },
