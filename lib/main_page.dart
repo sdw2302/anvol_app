@@ -15,15 +15,19 @@ class _MainPageState extends State<MainPage> {
   bool loggedIn = false;
   String username = '';
 
-  final List<Widget> _pages = [
-    const MainPageContent(),
-    const PlanningPage(),
-    const HRPage(),
-    const ReportsPage(),
-  ];
+  List<Widget> _pages = [];
 
   @override
   Widget build(BuildContext context) {
+    _pages = [
+      MainPageContent(
+        isLoggedIn: loggedIn,
+        username: username,
+      ),
+      const PlanningPage(),
+      const HRPage(),
+      const ReportsPage(),
+    ];
     return Scaffold(
       appBar: AppBar(
         foregroundColor: Colors.white,
@@ -110,7 +114,9 @@ class _MainPageState extends State<MainPage> {
                 // Perform login logic
 
                 // Once login is successful, close the dialog
-                loggedIn = true;
+                setState(() {
+                  loggedIn = true;
+                });
                 Navigator.of(context).pop();
               },
             ),
@@ -155,16 +161,30 @@ class _MainPageState extends State<MainPage> {
   }
 }
 
-class MainPageContent extends StatelessWidget {
-  const MainPageContent({Key? key}) : super(key: key);
+class MainPageContent extends StatefulWidget {
+  final bool isLoggedIn;
+  final String username;
+
+  const MainPageContent(
+      {Key? key, required this.isLoggedIn, required this.username})
+      : super(key: key);
 
   @override
+  State<MainPageContent> createState() => _MainPageContentState();
+}
+
+class _MainPageContentState extends State<MainPageContent> {
+  @override
   Widget build(BuildContext context) {
-    return const Center(
+    return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          Text('Home page'),
+          Text(
+            widget.isLoggedIn
+                ? 'Welcome, ${widget.username}!'
+                : 'Please log in',
+          ),
         ],
       ),
     );
