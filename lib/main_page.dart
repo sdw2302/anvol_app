@@ -110,11 +110,11 @@ class _MainPageState extends State<MainPage> {
             TextButton(
               child: const Text('Login'),
               onPressed: () {
-                username = usernameController.text;
                 // Perform login logic
 
                 // Once login is successful, close the dialog
                 setState(() {
+                  username = usernameController.text;
                   loggedIn = true;
                 });
                 Navigator.of(context).pop();
@@ -148,8 +148,10 @@ class _MainPageState extends State<MainPage> {
             ),
             TextButton(
               onPressed: () {
-                loggedIn = false;
-                username = '';
+                setState(() {
+                  loggedIn = false;
+                  username = '';
+                });
                 Navigator.of(context).pop();
               },
               child: const Text('Logout'),
@@ -181,9 +183,7 @@ class _MainPageContentState extends State<MainPageContent> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           Text(
-            widget.isLoggedIn
-                ? 'Welcome, ${widget.username}!'
-                : 'Please log in',
+            widget.isLoggedIn ? 'Home page' : 'Please log in',
           ),
         ],
       ),
