@@ -1,5 +1,6 @@
-import 'package:anvol_app/planning_page.dart';
 import 'package:anvol_app/hr_page.dart';
+import 'package:anvol_app/planning_page.dart';
+import 'package:anvol_app/profile_page.dart';
 import 'package:anvol_app/reports_page.dart';
 import 'package:flutter/material.dart';
 
@@ -23,34 +24,31 @@ class _MainPageState extends State<MainPage> {
       MainPageContent(
         isLoggedIn: loggedIn,
         username: username,
+        setUsername: _setUsername,
+        setLoggedIn: _setLoggedIn,
       ),
       const PlanningPage(),
       const HRPage(),
       const ReportsPage(),
+      const ProfilePage(),
     ];
     return Scaffold(
-      appBar: AppBar(
-        foregroundColor: Colors.white,
-        backgroundColor: const Color(0xffB2CB06),
-        title: const Text('Anvol App'),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.login),
-            onPressed: () {
-              if (!loggedIn) {
-                _showLoginDialog(context);
-              } else {
-                _showPersonalInfoPopup(context);
-              }
-            },
-          )
-        ],
-      ),
       body: _pages[_currentIndex],
       bottomNavigationBar: loggedIn ? _buildBottomNavigationBar() : null,
       backgroundColor: Colors.white,
     );
+  }
+
+  void _setUsername(String name) {
+    setState(() {
+      username = name;
+    });
+  }
+
+  void _setLoggedIn(bool state) {
+    setState(() {
+      loggedIn = state;
+    });
   }
 
   BottomNavigationBar _buildBottomNavigationBar() {
@@ -78,91 +76,14 @@ class _MainPageState extends State<MainPage> {
           icon: Icon(Icons.analytics),
           label: 'Reports',
         ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.login),
+          label: 'Profile',
+        ),
       ],
       backgroundColor: const Color(0xffE7E7E7),
       selectedItemColor: const Color(0xffFFD30B),
       unselectedItemColor: Colors.grey,
-    );
-  }
-
-  void _showLoginDialog(BuildContext context) {
-    TextEditingController usernameController = TextEditingController();
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Welcome!'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextFormField(
-                controller: usernameController,
-                decoration: const InputDecoration(
-                  labelText: 'Username',
-                ),
-              ),
-              TextFormField(
-                obscureText: true,
-                decoration: const InputDecoration(
-                  labelText: 'Password',
-                ),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              child: const Text('Login'),
-              onPressed: () {
-                // Perform login logic
-
-                // Once login is successful, close the dialog
-                setState(() {
-                  username = usernameController.text;
-                  loggedIn = true;
-                });
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: const Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _showPersonalInfoPopup(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Hi, $username'),
-          content: const Text('This is a test!'),
-          actions: [
-            TextButton(
-              child: const Text('Close'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              onPressed: () {
-                setState(() {
-                  loggedIn = false;
-                  username = '';
-                  _currentIndex = 0;
-                });
-                Navigator.of(context).pop();
-              },
-              child: const Text('Logout'),
-            ),
-          ],
-        );
-      },
     );
   }
 }
@@ -170,9 +91,15 @@ class _MainPageState extends State<MainPage> {
 class MainPageContent extends StatefulWidget {
   final bool isLoggedIn;
   final String username;
+  final Function(String) setUsername;
+  final Function(bool) setLoggedIn;
 
   const MainPageContent(
-      {Key? key, required this.isLoggedIn, required this.username})
+      {Key? key,
+      required this.isLoggedIn,
+      required this.username,
+      required this.setUsername,
+      required this.setLoggedIn})
       : super(key: key);
 
   @override
@@ -180,17 +107,76 @@ class MainPageContent extends StatefulWidget {
 }
 
 class _MainPageContentState extends State<MainPageContent> {
+  TextEditingController usernameController = TextEditingController();
+  double screenWidth = 0;
+  double textFieldWidth = 0;
+  double paddingTopSize = 0;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    screenWidth = MediaQuery.of(context).size.width;
+    textFieldWidth = screenWidth * 0.3;
+    paddingTopSize = screenWidth * 0.02;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Text(
-            widget.isLoggedIn ? 'Home page' : 'Please log in',
+      child: widget.isLoggedIn ? const Text("Home Page") : _buildLoginPage(),
+    );
+  }
+
+  Column _buildLoginPage() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Align(
+          alignment: Alignment.center,
+          child: Title(
+            color: Colors.black,
+            child: const Text(
+              "Anvol",
+              style: TextStyle(fontSize: 40),
+            ),
           ),
-        ],
-      ),
+        ),
+        SizedBox(
+          width: textFieldWidth,
+          child: TextFormField(
+            controller: usernameController,
+            decoration: const InputDecoration(
+              labelText: 'Username',
+            ),
+          ),
+        ),
+        SizedBox(
+          width: textFieldWidth,
+          child: TextFormField(
+            obscureText: true,
+            decoration: const InputDecoration(
+              labelText: 'Password',
+            ),
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.only(top: paddingTopSize),
+        ),
+        TextButton(
+          child: const Text(
+            'Login',
+            style: TextStyle(
+              fontSize: 20,
+            ),
+          ),
+          onPressed: () {
+            // Perform login logic
+            String username = usernameController.text;
+            widget.setUsername(username);
+            widget.setLoggedIn(true);
+          },
+        ),
+      ],
     );
   }
 }
