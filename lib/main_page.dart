@@ -18,6 +18,16 @@ class _MainPageState extends State<MainPage> {
 
   List<Widget> _pages = [];
 
+  double screenWidth = 0;
+  double rowWidth = 0;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    screenWidth = MediaQuery.of(context).size.width;
+    rowWidth = screenWidth * 0.05;
+  }
+
   @override
   Widget build(BuildContext context) {
     _pages = [
@@ -32,10 +42,29 @@ class _MainPageState extends State<MainPage> {
       const ReportsPage(),
       const ProfilePage(),
     ];
+
+    final mediaQuery = MediaQuery.of(context);
+    final isLandscape = mediaQuery.orientation == Orientation.landscape;
+
     return Scaffold(
-      body: _pages[_currentIndex],
-      bottomNavigationBar: loggedIn ? _buildBottomNavigationBar() : null,
+      body: isLandscape ? _buildLandscapeBody(loggedIn) : _pages[_currentIndex],
+      bottomNavigationBar:
+          loggedIn && !isLandscape ? _buildBottomNavigationBar() : null,
       backgroundColor: Colors.white,
+    );
+  }
+
+  Widget _buildLandscapeBody(bool isLoggedIn) {
+    return Row(
+      children: [
+        SizedBox(
+          width: isLoggedIn ? rowWidth : 0,
+          child: isLoggedIn ? _buildNavigationRail() : null,
+        ),
+        Expanded(
+          child: _pages[_currentIndex],
+        ),
+      ],
     );
   }
 
@@ -49,6 +78,39 @@ class _MainPageState extends State<MainPage> {
     setState(() {
       loggedIn = state;
     });
+  }
+
+  NavigationRail _buildNavigationRail() {
+    return NavigationRail(
+      selectedIndex: _currentIndex,
+      onDestinationSelected: (int index) {
+        setState(() {
+          _currentIndex = index;
+        });
+      },
+      destinations: const [
+        NavigationRailDestination(
+          icon: Icon(Icons.home),
+          label: Text('Home'),
+        ),
+        NavigationRailDestination(
+          icon: Icon(Icons.calendar_today_rounded),
+          label: Text('Planning'),
+        ),
+        NavigationRailDestination(
+          icon: Icon(Icons.people),
+          label: Text('HR'),
+        ),
+        NavigationRailDestination(
+          icon: Icon(Icons.analytics),
+          label: Text('Reports'),
+        ),
+        NavigationRailDestination(
+          icon: Icon(Icons.person),
+          label: Text('Profile'),
+        ),
+      ],
+    );
   }
 
   BottomNavigationBar _buildBottomNavigationBar() {
@@ -77,7 +139,7 @@ class _MainPageState extends State<MainPage> {
           label: 'Reports',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.login),
+          icon: Icon(Icons.person),
           label: 'Profile',
         ),
       ],
@@ -94,13 +156,13 @@ class MainPageContent extends StatefulWidget {
   final Function(String) setUsername;
   final Function(bool) setLoggedIn;
 
-  const MainPageContent(
-      {Key? key,
-      required this.isLoggedIn,
-      required this.username,
-      required this.setUsername,
-      required this.setLoggedIn})
-      : super(key: key);
+  const MainPageContent({
+    Key? key,
+    required this.isLoggedIn,
+    required this.username,
+    required this.setUsername,
+    required this.setLoggedIn,
+  }) : super(key: key);
 
   @override
   State<MainPageContent> createState() => _MainPageContentState();
@@ -122,61 +184,111 @@ class _MainPageContentState extends State<MainPageContent> {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: widget.isLoggedIn ? const Text("Home Page") : _buildLoginPage(),
+    return Scaffold(
+      body: widget.isLoggedIn ? _buildHomePage() : _buildLoginPage(),
     );
   }
 
-  Column _buildLoginPage() {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Align(
-          alignment: Alignment.center,
-          child: Title(
-            color: Colors.black,
+  Padding _buildHomePage() {
+    String username = widget.username;
+    double padding = screenWidth * 0.01;
+    return Padding(
+      padding: EdgeInsets.all(padding),
+      child: Column(
+        children: [
+          Text(
+            "Hi, $username",
+            style: const TextStyle(fontSize: 20),
+          ),
+          Padding(padding: EdgeInsets.only(top: padding)),
+          Row(
+            children: [
+              Flexible(
+                flex: 1,
+                fit: FlexFit.tight,
+                child: Container(
+                  height: 100,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(15),
+                    border: Border.all(color: Colors.grey, width: 1),
+                    color: Colors.white,
+                  ),
+                  child: Icon(Icons.backpack),
+                ),
+              ),
+              Padding(padding: EdgeInsets.only(left: padding)),
+              Flexible(
+                flex: 1,
+                fit: FlexFit.tight,
+                child: Container(
+                  height: 100,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(15),
+                    border: Border.all(color: Colors.grey, width: 1),
+                    color: Colors.white,
+                  ),
+                  child: Icon(Icons.backpack),
+                ),
+              ),
+            ],
+          )
+        ],
+      ),
+    );
+  }
+
+  Center _buildLoginPage() {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Align(
+            alignment: Alignment.center,
+            child: Title(
+              color: Colors.black,
+              child: const Text(
+                "Anvol",
+                style: TextStyle(fontSize: 40),
+              ),
+            ),
+          ),
+          SizedBox(
+            width: textFieldWidth,
+            child: TextFormField(
+              controller: usernameController,
+              decoration: const InputDecoration(
+                labelText: 'Username',
+              ),
+            ),
+          ),
+          SizedBox(
+            width: textFieldWidth,
+            child: TextFormField(
+              obscureText: true,
+              decoration: const InputDecoration(
+                labelText: 'Password',
+              ),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.only(top: paddingTopSize),
+          ),
+          TextButton(
             child: const Text(
-              "Anvol",
-              style: TextStyle(fontSize: 40),
+              'Login',
+              style: TextStyle(
+                fontSize: 20,
+              ),
             ),
+            onPressed: () {
+              // Perform login logic
+              String username = usernameController.text;
+              widget.setUsername(username);
+              widget.setLoggedIn(true);
+            },
           ),
-        ),
-        SizedBox(
-          width: textFieldWidth,
-          child: TextFormField(
-            controller: usernameController,
-            decoration: const InputDecoration(
-              labelText: 'Username',
-            ),
-          ),
-        ),
-        SizedBox(
-          width: textFieldWidth,
-          child: TextFormField(
-            obscureText: true,
-            decoration: const InputDecoration(
-              labelText: 'Password',
-            ),
-          ),
-        ),
-        Padding(
-          padding: EdgeInsets.only(top: paddingTopSize),
-        ),
-        TextButton(
-          child: const Text(
-            'Login',
-            style: TextStyle(
-              fontSize: 20,
-            ),
-          ),
-          onPressed: () {
-            // Perform login logic
-            String username = usernameController.text;
-            widget.setUsername(username);
-            widget.setLoggedIn(true);
-          },
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
