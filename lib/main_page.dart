@@ -1,8 +1,8 @@
 import 'package:anvol_app/hr_page.dart';
 import 'package:anvol_app/planning_page.dart';
-import 'package:anvol_app/profile_page.dart';
 import 'package:anvol_app/reports_page.dart';
 import 'package:flutter/material.dart';
+import 'package:anvol_app/db_handler.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({Key? key}) : super(key: key);
@@ -13,6 +13,7 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   int _currentIndex = 0;
+  int _lstIndex = 0;
   bool loggedIn = false;
   String username = '';
 
@@ -39,15 +40,18 @@ class _MainPageState extends State<MainPage> {
       ),
       const PlanningPage(),
       const HRPage(),
-      const ReportsPage(),
-      const ProfilePage(),
+      const ReportsPage()
     ];
 
     final mediaQuery = MediaQuery.of(context);
     final isLandscape = mediaQuery.orientation == Orientation.landscape;
 
     return Scaffold(
-      body: isLandscape ? _buildLandscapeBody(loggedIn) : _pages[_currentIndex],
+      body: isLandscape
+          ? _buildLandscapeBody(loggedIn)
+          : _currentIndex < 4
+              ? _pages[_currentIndex]
+              : _pages[_lstIndex],
       bottomNavigationBar:
           loggedIn && !isLandscape ? _buildBottomNavigationBar() : null,
       backgroundColor: Colors.white,
@@ -62,7 +66,7 @@ class _MainPageState extends State<MainPage> {
           child: isLoggedIn ? _buildNavigationRail() : null,
         ),
         Expanded(
-          child: _pages[_currentIndex],
+          child: _currentIndex < 4 ? _pages[_currentIndex] : _pages[_lstIndex],
         ),
       ],
     );
@@ -85,7 +89,15 @@ class _MainPageState extends State<MainPage> {
       selectedIndex: _currentIndex,
       onDestinationSelected: (int index) {
         setState(() {
-          _currentIndex = index;
+          if (index == 4) {
+            setState(() {
+              _lstIndex = _currentIndex;
+              _currentIndex = index;
+            });
+            _ifLoggedChecker();
+          } else {
+            _currentIndex = index;
+          }
         });
       },
       destinations: const [
@@ -118,7 +130,15 @@ class _MainPageState extends State<MainPage> {
       currentIndex: _currentIndex,
       onTap: (int index) {
         setState(() {
-          _currentIndex = index;
+          if (index == 4) {
+            setState(() {
+              _lstIndex = _currentIndex;
+              _currentIndex = index;
+            });
+            _ifLoggedChecker();
+          } else {
+            _currentIndex = index;
+          }
         });
       },
       items: const [
@@ -148,6 +168,91 @@ class _MainPageState extends State<MainPage> {
       unselectedItemColor: Colors.grey,
     );
   }
+
+  void _showLoginDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Login'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextFormField(
+                decoration: InputDecoration(
+                  labelText: 'Username',
+                ),
+              ),
+              SizedBox(height: 16),
+              TextFormField(
+                obscureText: true,
+                decoration: InputDecoration(
+                  labelText: 'Password',
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              child: Text('Login'),
+              onPressed: () {
+                // Perform login logic
+
+                // Once login is successful, close the dialog
+                loggedIn = true;
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _ifLoggedChecker() {
+    if (!loggedIn) {
+      _showLoginDialog(context);
+    } else {
+      _showPersonalInfoPopup(context);
+    }
+  }
+
+  void _showPersonalInfoPopup(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Account'),
+          content: Text('Hi ${username}'),
+          actions: [
+            TextButton(
+              child: Text('Close'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Log out'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                setState(() {
+                  loggedIn = false;
+                  _currentIndex = 0;
+                  username = "";
+                });
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 }
 
 class MainPageContent extends StatefulWidget {
@@ -170,6 +275,7 @@ class MainPageContent extends StatefulWidget {
 
 class _MainPageContentState extends State<MainPageContent> {
   TextEditingController usernameController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
   double screenWidth = 0;
   double textFieldWidth = 0;
   double paddingTopSize = 0;
@@ -200,38 +306,6 @@ class _MainPageContentState extends State<MainPageContent> {
             "Hi, $username",
             style: const TextStyle(fontSize: 20),
           ),
-          Padding(padding: EdgeInsets.only(top: padding)),
-          Row(
-            children: [
-              Flexible(
-                flex: 1,
-                fit: FlexFit.tight,
-                child: Container(
-                  height: 100,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(15),
-                    border: Border.all(color: Colors.grey, width: 1),
-                    color: Colors.white,
-                  ),
-                  child: Icon(Icons.backpack),
-                ),
-              ),
-              Padding(padding: EdgeInsets.only(left: padding)),
-              Flexible(
-                flex: 1,
-                fit: FlexFit.tight,
-                child: Container(
-                  height: 100,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(15),
-                    border: Border.all(color: Colors.grey, width: 1),
-                    color: Colors.white,
-                  ),
-                  child: Icon(Icons.backpack),
-                ),
-              ),
-            ],
-          )
         ],
       ),
     );
@@ -247,7 +321,7 @@ class _MainPageContentState extends State<MainPageContent> {
             child: Title(
               color: Colors.black,
               child: const Text(
-                "Anvol",
+                "XS",
                 style: TextStyle(fontSize: 40),
               ),
             ),
@@ -264,6 +338,7 @@ class _MainPageContentState extends State<MainPageContent> {
           SizedBox(
             width: textFieldWidth,
             child: TextFormField(
+              controller: passwordController,
               obscureText: true,
               decoration: const InputDecoration(
                 labelText: 'Password',
@@ -285,6 +360,8 @@ class _MainPageContentState extends State<MainPageContent> {
               String username = usernameController.text;
               widget.setUsername(username);
               widget.setLoggedIn(true);
+              usernameController.clear();
+              passwordController.clear();
             },
           ),
         ],

@@ -13,7 +13,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Anvol App',
+      title: 'XS App',
       theme: ThemeData(
         colorScheme: const ColorScheme(
           brightness: Brightness.light,
